@@ -15,6 +15,7 @@ class GameProvider extends ChangeNotifier {
   final int rows = 4;
   final int cols = 4;
   late PathFinder pathFinder;
+  bool isWon = false;
 
   GameProvider() {
     pathFinder = PathFinder(rows, cols);
@@ -33,11 +34,12 @@ class GameProvider extends ChangeNotifier {
     //   [0, 0, 0, 0, 0, 0], // Viền dưới
     // ];
     firstSelected = null;
+    isWon = false;
     notifyListeners(); // Báo cho UI vẽ lại màn hình
   }
 
   void handleTap(int y, int x) {
-    if (board[y][x] == 0) return; // Nếu chạm vào ô trống thì bỏ qua
+    if (board[y][x] == 0 || isWon) return; // Nếu chạm vào ô trống thì bỏ qua
 
     if (firstSelected == null) {
       // Trường hợp 1: Chưa chọn ô nào -> Ghi nhớ ô này làm ô đầu tiên
@@ -69,17 +71,18 @@ class GameProvider extends ChangeNotifier {
           board[p2.y][p2.x] = 0;
           currentPath = null; // Xóa đường vẽ
 
-          bool isWin = true;
+          bool hasRemaining = true;
           for (int y = 1; y <= rows; y++) {
             for (int x = 1; x <= cols; x++) {
               if (board[y][x] != 0) {
-                isWin = false;
+                hasRemaining = false;
                 break;
               }
             }
           }
-          if (isWin) {
+          if (hasRemaining) {
             print("🎉 Bạn đã chiến thắng!");
+            isWon = true;
           } else if (!hasValidMove()) {
             print("💀 Hết nước đi! Vui lòng xáo trộn lại bàn cờ.");
             shuffleBoard();
