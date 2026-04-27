@@ -21,7 +21,10 @@ class GameplayScreen extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Level 1'),
+            Text(
+              'Level ${gameProvider.currentLevel}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -185,11 +188,11 @@ class GameplayScreen extends StatelessWidget {
                         ElevatedButton.icon(
                           onPressed: () {
                             // Gọi hàm reset game
-                            context.read<GameProvider>().startNewGame();
+                            context.read<GameProvider>().nextLevel();
                           },
-                          icon: const Icon(Icons.replay_rounded),
+                          icon: const Icon(Icons.arrow_forward_rounded),
                           label: const Text(
-                            'Chơi lại màn mới',
+                            'Màn tiếp theo',
                             style: TextStyle(fontSize: 18),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -197,7 +200,8 @@ class GameplayScreen extends StatelessWidget {
                               horizontal: 24,
                               vertical: 12,
                             ),
-                            backgroundColor: Colors.blueAccent,
+                            backgroundColor:
+                                Colors.green, // Đổi màu xanh lá cho khí thế
                             foregroundColor: Colors.white,
                           ),
                         ),
