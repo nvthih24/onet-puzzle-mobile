@@ -22,6 +22,38 @@ class GameplayScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Level 1'),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: gameProvider.timeLeft <= 10
+                    ? Colors.redAccent.withOpacity(0.3)
+                    : Colors.grey.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.timer,
+                    size: 18,
+                    color: gameProvider.timeLeft <= 10
+                        ? Colors.red
+                        : Colors.black87,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${gameProvider.timeLeft}s',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: gameProvider.timeLeft <= 10
+                          ? Colors.red
+                          : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
             // Hiển thị điểm số ở góc phải
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -166,6 +198,63 @@ class GameplayScreen extends StatelessWidget {
                               vertical: 12,
                             ),
                             backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              if (gameProvider.isGameOver)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(
+                        0.7,
+                      ), // Nền tối cho cảm giác tiếc nuối
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.timer_off,
+                          size: 100,
+                          color: Colors.redAccent,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'HẾT GIỜ!',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Điểm của bạn: ${gameProvider.score}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Colors.amberAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            context.read<GameProvider>().startNewGame();
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text(
+                            'Thử lại ngay',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            backgroundColor: Colors.redAccent,
                             foregroundColor: Colors.white,
                           ),
                         ),
