@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/board_manager.dart';
 import '../utils/path_finder.dart';
+import 'dart:async';
 
 // Tạo một class nhỏ để lưu tọa độ cho gọn
 class Point {
@@ -16,7 +17,10 @@ class GameProvider extends ChangeNotifier {
   final int cols = 4;
   late PathFinder pathFinder;
   bool isWon = false;
+  bool isGameOver = false;
   int score = 0;
+  int timeLeft = 60; // Cho 60 giây để test, sau này ông có thể chỉnh theo Level
+  Timer? _timer;
 
   GameProvider() {
     pathFinder = PathFinder(rows, cols);
@@ -36,12 +40,16 @@ class GameProvider extends ChangeNotifier {
     // ];
     firstSelected = null;
     isWon = false;
+    isGameOver = false;
     score = 0;
+    timeLeft = 60;
+    _startTimer();
     notifyListeners(); // Báo cho UI vẽ lại màn hình
   }
 
   void handleTap(int y, int x) {
-    if (board[y][x] == 0 || isWon) return; // Nếu chạm vào ô trống thì bỏ qua
+    if (board[y][x] == 0 || isWon || isGameOver)
+      return; // Nếu chạm vào ô trống thì bỏ qua
 
     if (firstSelected == null) {
       // Trường hợp 1: Chưa chọn ô nào -> Ghi nhớ ô này làm ô đầu tiên
@@ -158,5 +166,24 @@ class GameProvider extends ChangeNotifier {
         }
       }
     }
+  }
+
+  void _startTimer() {
+    // Hủy timer cũ nếu có để tránh bị chạy chồng chéo
+    _timer?.cancel();
+
+    // Tạo 1 bộ đếm, cứ 1 giây (1 seconds) là chạy code bên trong 1 lần
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (timeLeft > 0 && !isWon && !isGameOver) {
+        timeLeft--;
+        notifyListeners(); // Cập nhật số giây lên màn hình
+      } else {
+        timer.cancel(); // Dừng đồng hồ
+        if (timeLeft == 0 && !isWon) {
+          isGameOver = true; // Hết giờ -> Thua
+          notifyListeners(); // Báo UI hiện màn hình Game Over
+        }
+      }
+    });
   }
 }
