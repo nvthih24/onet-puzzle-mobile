@@ -22,6 +22,7 @@ class GameplayScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Stack(
+            alignment: Alignment.center,
             children: [
               GridView.builder(
                 shrinkWrap: true,
@@ -90,6 +91,61 @@ class GameplayScreen extends StatelessWidget {
                       rows: totalRows,
                       cols: totalCols,
                       spacing: 6.0,
+                    ),
+                  ),
+                ),
+              if (gameProvider.isWon)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(
+                        0.85,
+                      ), // Làm mờ nền phía sau
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.emoji_events_rounded, // Biểu tượng cúp vàng
+                          size: 100,
+                          color: Colors.amber,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'XUẤT SẮC!',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueAccent,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Bạn đã dọn sạch bàn cờ.',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // Gọi hàm reset game
+                            context.read<GameProvider>().startNewGame();
+                          },
+                          icon: const Icon(Icons.replay_rounded),
+                          label: const Text(
+                            'Chơi lại màn mới',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
