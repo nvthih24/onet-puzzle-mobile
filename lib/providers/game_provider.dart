@@ -22,6 +22,10 @@ class GameProvider extends ChangeNotifier {
   int timeLeft = 60; // Cho 60 giây để test, sau này ông có thể chỉnh theo Level
   Timer? _timer;
   int currentLevel = 1;
+  int maxTime = 60; // Biến lưu tổng thời gian để tính % cho thanh Progress
+  int shuffleCount = 1; // Số lượt đảo hình
+  int hintCount = 1; // Số lượt gợi ý
+  List<Point>? hintPoints; // Lưu tọa độ 2 ô được gợi ý để làm sáng lên
 
   GameProvider() {
     startNewGame();
@@ -54,6 +58,7 @@ class GameProvider extends ChangeNotifier {
       if (timeLeft < 30)
         timeLeft = 30; // Mức khó nhất không bao giờ dưới 30 giây
     }
+    maxTime = timeLeft;
   }
 
   // Hàm setup bàn cờ (dùng chung cho cả lúc New Game và lúc Next Level)
@@ -75,6 +80,8 @@ class GameProvider extends ChangeNotifier {
   void startNewGame() {
     currentLevel = 1;
     score = 0;
+    shuffleCount = 3;
+    hintCount = 3;
     _initBoard();
     notifyListeners(); // Báo cho UI vẽ lại màn hình
   }
@@ -82,6 +89,8 @@ class GameProvider extends ChangeNotifier {
   // Qua màn tiếp theo (Giữ nguyên điểm, Tăng Level)
   void nextLevel() {
     currentLevel++;
+    shuffleCount++; // Thưởng thêm 1 lượt đảo hình khi qua màn
+    hintCount++;
     _initBoard();
   }
 
@@ -223,5 +232,47 @@ class GameProvider extends ChangeNotifier {
         }
       }
     });
+  }
+
+  void manualShuffle() {
+    if (shuffleCount > 0) {
+      shuffleCount--;
+      shuffleBoard();
+      notifyListeners();
+    }
+  }
+
+  void useHint() {
+    if (hintCount > 0 && hintPoints == null) {
+      // Quét bàn cờ tìm 1 cặp giống hàm hasValidMove()
+      List<Point> activePoints = [];
+      for (int y = 1; y <= rows; y++) {
+        for (int x = 1; x <= cols; x++) {
+          if (board[y][x] != 0) activePoints.add(Point(x, y));
+        }
+      }
+
+      for (int i = 0; i < activePoints.length - 1; i++) {
+        for (int j = i + 1; j < activePoints.length; j++) {
+          Point p1 = activePoints[i];
+          Point p2 = activePoints[j];
+
+          if (board[p1.y][p1.x] == board[p2.y][p2.x]) {
+            if (pathFinder.findPath(p1, p2, board) != null) {
+              hintCount--;
+              hintPoints = [p1, p2]; // Lưu lại 2 điểm để vẽ màu vàng trên UI
+              notifyListeners();
+
+              // Tắt màu vàng gợi ý sau 1.5 giây
+              Future.delayed(const Duration(milliseconds: 1500), () {
+                hintPoints = null;
+                notifyListeners();
+              });
+              return; // Tìm được 1 cặp là thoát hàm luôn
+            }
+          }
+        }
+      }
+    }
   }
 }
