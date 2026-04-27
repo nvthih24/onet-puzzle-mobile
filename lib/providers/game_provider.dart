@@ -13,38 +13,76 @@ class GameProvider extends ChangeNotifier {
   late List<List<int>> board;
   Point? firstSelected; // Lưu lại tọa độ ô đầu tiên được chọn
   List<Point>? currentPath; // Lưu đường nối hiện tại (nếu có)
-  final int rows = 4;
-  final int cols = 4;
+  int rows = 4;
+  int cols = 4;
   late PathFinder pathFinder;
   bool isWon = false;
   bool isGameOver = false;
   int score = 0;
   int timeLeft = 60; // Cho 60 giây để test, sau này ông có thể chỉnh theo Level
   Timer? _timer;
+  int currentLevel = 1;
 
   GameProvider() {
-    pathFinder = PathFinder(rows, cols);
     startNewGame();
   }
 
-  void startNewGame() {
+  // Hàm tính toán kích thước và thời gian theo lộ trình ông vạch ra
+  void _updateLevelConfig() {
+    if (currentLevel <= 3) {
+      cols = 4;
+      rows = 4;
+      timeLeft = 60;
+    } else if (currentLevel <= 6) {
+      cols = 4;
+      rows = 6;
+      timeLeft = 90;
+    } else if (currentLevel <= 9) {
+      cols = 6;
+      rows = 6;
+      timeLeft = 120;
+    } else if (currentLevel <= 12) {
+      cols = 6;
+      rows = 8;
+      timeLeft = 150;
+    } else {
+      cols = 6;
+      rows = 10;
+      // Sinh tồn cực hạn: Bắt đầu từ Level 13, cứ qua 1 màn là trừ đi 5 giây
+      int timeReduction = (currentLevel - 13) * 5;
+      timeLeft = 180 - timeReduction;
+      if (timeLeft < 30)
+        timeLeft = 30; // Mức khó nhất không bao giờ dưới 30 giây
+    }
+  }
+
+  // Hàm setup bàn cờ (dùng chung cho cả lúc New Game và lúc Next Level)
+  void _initBoard() {
+    _updateLevelConfig();
     var boardManager = BoardManager(rows: rows, cols: cols);
     board = boardManager.generateBoard();
-    // board = [
-    //   [0, 0, 0, 0, 0, 0], // Viền trên
-    //   [0, 1, 1, 2, 3, 0], // Cặp 1-1 là "mồi nhử"
-    //   [0, 4, 5, 6, 7, 0],
-    //   [0, 3, 2, 8, 4, 0],
-    //   [0, 7, 6, 5, 8, 0],
-    //   [0, 0, 0, 0, 0, 0], // Viền dưới
-    // ];
+
+    // RẤT QUAN TRỌNG: Phải cập nhật lại kích thước mới cho bộ não tìm đường
+    pathFinder = PathFinder(rows, cols);
+
     firstSelected = null;
     isWon = false;
     isGameOver = false;
-    score = 0;
-    timeLeft = 60;
     _startTimer();
+    notifyListeners();
+  }
+
+  void startNewGame() {
+    currentLevel = 1;
+    score = 0;
+    _initBoard();
     notifyListeners(); // Báo cho UI vẽ lại màn hình
+  }
+
+  // Qua màn tiếp theo (Giữ nguyên điểm, Tăng Level)
+  void nextLevel() {
+    currentLevel++;
+    _initBoard();
   }
 
   void handleTap(int y, int x) {
