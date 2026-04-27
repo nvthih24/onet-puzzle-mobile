@@ -80,8 +80,8 @@ class GameProvider extends ChangeNotifier {
   void startNewGame() {
     currentLevel = 1;
     score = 0;
-    shuffleCount = 3;
-    hintCount = 3;
+    shuffleCount = 1;
+    hintCount = 1;
     _initBoard();
     notifyListeners(); // Báo cho UI vẽ lại màn hình
   }
