@@ -17,7 +17,31 @@ class GameplayScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(title: const Text('Level 1'), centerTitle: true),
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Level 1'),
+            // Hiển thị điểm số ở góc phải
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.amberAccent.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                'Điểm: ${gameProvider.score}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepOrange,
+                ),
+              ),
+            ),
+          ],
+        ),
+        centerTitle: false, // Tắt centerTitle để Row tràn đều 2 bên
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

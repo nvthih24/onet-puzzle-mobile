@@ -16,6 +16,7 @@ class GameProvider extends ChangeNotifier {
   final int cols = 4;
   late PathFinder pathFinder;
   bool isWon = false;
+  int score = 0;
 
   GameProvider() {
     pathFinder = PathFinder(rows, cols);
@@ -35,6 +36,7 @@ class GameProvider extends ChangeNotifier {
     // ];
     firstSelected = null;
     isWon = false;
+    score = 0;
     notifyListeners(); // Báo cho UI vẽ lại màn hình
   }
 
@@ -63,6 +65,7 @@ class GameProvider extends ChangeNotifier {
         print("🟢 Nối thành công!");
         // Tạm thời vẽ 1 đường thẳng nối trực tiếp 2 điểm
         currentPath = validPath;
+        score += 100;
         notifyListeners(); // Báo cho UI vẽ đường nối
 
         // Đợi 0.5 giây để người chơi nhìn thấy đường nối, sau đó mới xóa hình
